@@ -10,4 +10,5 @@ A very useful tool that utilizes the powerful Wolfram Alpha API to do some reall
  </ul>
  <h3>Uhm okay, how do I use it?</h3>
 <p>It's really easy. Run the file using your terminal or your favorite IDE.</p>
-**Must be connected to the Internet.**
+
+**Must be connected to the Internet for the script to work.**
