@@ -9,4 +9,6 @@ A very useful tool that utilizes the powerful Wolfram Alpha API to do some reall
   <li>Runge-Kutte-4 Approximation to an ODE given the initial condition</li>
  </ul>
  <h3>Uhm okay, how do I use it?</h3>
-It's really easy. Run the file using your terminal or your favorite IDE. **Must be connected to the Internet for the script to work.**
+<p>It's really easy. Run the file using your terminal or your favorite IDE.</p>
+
+**Must be connected to the Internet for the script to work.**
