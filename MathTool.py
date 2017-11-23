@@ -1,6 +1,7 @@
 import urllib.request as request
 import urllib.parse as parse
 import json, math
+from itertools import permutations as perm
 
 key = "WK3WR6-H56GY5954K"
 base_url = "https://api.wolframalpha.com/v2/query?"
@@ -18,11 +19,12 @@ def intro():
           "\n 9) Permutation of a list")
 
 def get_function():
-    func = {1: solve_polynomial, 2:integrate, 3: differentiate, 4: eigen, 5:rk4, 6: integer_partition}
+    func = {1: solve_polynomial, 2:integrate, 3: differentiate, 4: eigen, 5:rk4, 6: integer_partition, 7: sequence, 8: series_sum, 9: permute}
     choice = int(input("Choice: "))
     return func[choice]()
 
 def make_json(func_string):
+    #print(base_url + parse.urlencode([('input', func_string), ('format', 'plaintext'), ('output', 'JSON'), ('appid', key)]))
     return json.loads(request.urlopen(base_url + parse.urlencode([('input', func_string), ('format', 'plaintext'), ('output', 'JSON'), ('appid', key)])).read().decode(encoding='utf-8'))
 
 def solve_polynomial():
@@ -31,28 +33,25 @@ def solve_polynomial():
         func += ' = 0'
     json_data = make_json(func)
     hub = json_data['queryresult']['pods']
-    s = ''
     factors = hub[1]['subpods'][0]['plaintext'].split('=')[0]
     if len(factors) == 0:
         factors = hub[2]['subpods'][0]['plaintext'].split('=')[0]
-    s += "Factors: " + factors + '\n'
-    s += 'Real Solution: {'
+    rs = ''
     for i in hub[3]['subpods']:
         if '=' in i['plaintext']:
-            s += i['plaintext'].split('x = ')[1] + ", "
+            rs += i['plaintext'].split('x = ')[1] + ", "
         else:
-            s += i['plaintext'].split('x~')[1] + ", "
-    s = s[:-2] + "}\nComplex Solution: {"
+            rs += i['plaintext'].split('x~')[1] + ", "
+    cs = ''
     for i in hub[4]['subpods']:
         if len(i['plaintext']) == 0:
-            s += "None  "
+            cs += "None  "
             break
         elif '=' in i['plaintext']:
-            s += i['plaintext'].split('x = ')[1] + ", "
+            cs += i['plaintext'].split('x = ')[1] + ", "
         else:
-            s += i['plaintext'].split('x~')[1] + ", "
-    s = s[:-2] + '}'
-    return s
+            cs += i['plaintext'].split('x~')[1] + ", "
+    return 'Factors: {f}\nReal Solution: {{{rs}}}\nComplex Solution: {cs}'.format(f=factors,rs=rs[:-2],cs=cs[:-2])
 
 def integrate():
     func = "integrate " + input("f(x): ").rstrip()
@@ -96,16 +95,44 @@ def rk4():
     return 'x = {}\nExact Solution: {}\nLocal Error = {}\nGlobal Error = {}'.format(result[0],exact_soln,result[1],result[2])
 
 def integer_partition():
-    pass
+    num = "integer partition of " + input("Enter number to find partitions of: ")
+    return 'Number of partitions = {}'.format(make_json(num)['queryresult']['pods'][2]['subpods'][0]['plaintext'])
 
-def calculate():
+def sequence():
+    notfound = '(no form found in terms of holonomic sequences)'
+    series = input("Enter first few numbers of the series (separated by comma): ") + ",..."
+    data = make_json(series)['queryresult']['pods']
+    if data[-1]['subpods'][0]['plaintext'] == notfound:
+        return "No match found"
+    else:
+        return data[1]['subpods'][0]['plaintext'] + '\n' + data[1]['infos']['text'] + "\nURL: " + data[1]['infos']['links'][0]['url']
+
+def series_sum():
+    series = input("Enter first few terms of the series (comma separated): ").replace(',','+')
+    last = input("Enter last term after for finite sum or blank to calculate infinite sum: ")
+    if len(last) == 0:
+        series += "+..."
+    else:
+        series += "+...+" + str(last)
+    data = make_json(series)['queryresult']['pods']
+    return "Sum = {}\nConvergence: {}".format(data[1]['subpods'][0]['plaintext'], data[2]['subpods'][0]['plaintext'])
+
+def permute():
+    data = input('Enter elements seperated by comma to permute: ').split(',')
+    a = set()
+    for i in perm(data):
+        if i not in a:
+            a.add(i)
+    return '\n'.join(map(lambda x: str(x), a))
+
+def display():
     result = get_function()
     print("----------\n" + result + "\n----------")
 
 if __name__ == '__main__':
     while True:
         intro()
-        calculate()
+        display()
         if input("Quit? (y/n)").lower() == 'y':
             break
     print("Courtesy of Wolfram Alpha. Program intended for personal use only.")
