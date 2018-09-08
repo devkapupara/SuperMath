@@ -7,6 +7,10 @@ A very useful tool that utilizes the powerful Wolfram Alpha API to do some reall
   <li>Differentiation of a function</li>
   <li>Finding EigenValues and EigenVectors of a matrix</li>
   <li>Runge-Kutte-4 Approximation to an ODE given the initial condition</li>
+  <li>Series analyzer and its generating function</li>
+  <li>Integer Partition</li>
+  <li>Sum of a series</li>
+  <li>Permutations of any given elements [Strings, integer set]</li>
  </ul>
  <h3>Uhm okay, how do I use it?</h3>
 <p>It's really easy. Run the file using your terminal or your favorite IDE.</p>
