@@ -19,12 +19,16 @@ def intro():
           "\n 9) Permutation of a list")
 
 def get_function():
-    func = {1: solve_polynomial, 2:integrate, 3: differentiate, 4: eigen, 5:rk4, 6: integer_partition, 7: sequence, 8: series_sum, 9: permute}
-    choice = int(input("Choice: "))
-    return func[choice]()
+    valid = True
+    while valid:
+        try:
+            choice = int(input("Choice: "))
+            valid = False
+        except Exception:
+            print("Invalid Entry")
+    return func_dict[choice]()
 
 def make_json(func_string):
-    #print(base_url + parse.urlencode([('input', func_string), ('format', 'plaintext'), ('output', 'JSON'), ('appid', key)]))
     return json.loads(request.urlopen(base_url + parse.urlencode([('input', func_string), ('format', 'plaintext'), ('output', 'JSON'), ('appid', key)])).read().decode(encoding='utf-8'))
 
 def solve_polynomial():
@@ -110,10 +114,7 @@ def sequence():
 def series_sum():
     series = input("Enter first few terms of the series (comma separated): ").replace(',','+')
     last = input("Enter last term after for finite sum or blank to calculate infinite sum: ")
-    if len(last) == 0:
-        series += "+..."
-    else:
-        series += "+...+" + str(last)
+    series += ("+..." if len(last) == 0 else "+...+" + str(last))
     data = make_json(series)['queryresult']['pods']
     return "Sum = {}\nConvergence: {}".format(data[1]['subpods'][0]['plaintext'], data[2]['subpods'][0]['plaintext'])
 
@@ -123,7 +124,9 @@ def permute():
     for i in perm(data):
         if i not in a:
             a.add(i)
-    return '\n'.join(map(lambda x: str(x), a))
+    return '{} permutations found\n'.format(len(a)) + '\n'.join(map(lambda x: str(x), a))
+
+func_dict = {1: solve_polynomial, 2:integrate, 3: differentiate, 4: eigen, 5:rk4, 6: integer_partition, 7: sequence, 8: series_sum, 9: permute}
 
 def display():
     result = get_function()
